@@ -43,7 +43,7 @@ class VectorStore:
 
         self.index.add(embeddings)
         self.documents.extend(texts)
-        self.save()
+        self._save()
 
     def search(self, query: str, top_k: int = 5):
         query_embedding = self.model.encode([query], convert_to_numpy=True)
