@@ -34,7 +34,7 @@ class VectorStore:
         with open(self.index_file, "wb") as f:
             pickle.dump(data, f)
 
-    def add_chunks(self, chunk_id: int, text: str):
+    def add_chunk(self, chunk_id: int, text: str):
         embedding = self.model.encode([text], convert_to_numpy=True)
         if self.index is None:
             dim = embedding.shape[1]

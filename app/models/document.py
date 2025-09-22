@@ -19,8 +19,8 @@ class Chunk(Base):
     __tablename__ = "chunks"
 
     id = Column(Integer, primary_key=True, index=True)
-    doc_id = Column(Integer, ForeignKey("documents.id", onedelete="CASCADE"), nullable=False)
+    doc_id = Column(Integer, ForeignKey("documents.id", ondelete="CASCADE"), nullable=False)
     text = Column(Text, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    document = relationship
+    document = relationship("Document", back_populates="chunks")
