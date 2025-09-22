@@ -6,10 +6,8 @@ from sentence_transformers import SentenceTransformer
 import faiss
 
 
-DATA_DIR = Path("data/uploads")
 INDEX_DIR = Path("data/index")
 INDEX_DIR.mkdir(exist_ok=True)
-
 
 INDEX_FILE = INDEX_DIR / "document.index.pkl"
 
@@ -19,7 +17,8 @@ class VectorStore:
         self.index_file = index_file
         self.model = SentenceTransformer("all-MiniLM-L6-v2")
         self.index = None
-        self.documents = []
+        self.doc_ids: List[int] = []
+        self.chunk_ids: List[int] = []
 
         if self.index_file.exists():
             self._load()
@@ -28,25 +27,29 @@ class VectorStore:
         with open(self.index_file, "rb") as f:
             data = pickle.load(f)
             self.index = data["index"]
-            self.documents = data["documents"]
+            self.doc_ids = data["doc_ids"]
 
     def _save(self):
-        data = {"index": self.index, "documents": self.documents}
+        data = {"index": self.index, "doc_ids": self.doc_ids}
         with open(self.index_file, "wb") as f:
             pickle.dump(data, f)
 
-    def add_documents(self, texts: List[str]):
-        embeddings = self.model.encode(texts, convert_to_numpy=True)
+    def add_chunks(self, chunk_id: int, text: str):
+        embedding = self.model.encode([text], convert_to_numpy=True)
         if self.index is None:
-            dim = embeddings.shape[1]
+            dim = embedding.shape[1]
             self.index = faiss.IndexFlatL2(dim)
 
-        self.index.add(embeddings)
-        self.documents.extend(texts)
+        self.index.add(embedding)
+        self.doc_ids.append(chunk_id)
         self._save()
 
     def search(self, query: str, top_k: int = 5):
+        if self.index is None or not self.chunk_ids:
+            return []
+
         query_embedding = self.model.encode([query], convert_to_numpy=True)
         D, I = self.index.search(query_embedding, top_k)
-        results = [self.documents[i] for i in I[0]]
+
+        results = [self.chunk_ids[i] for i in I[0]]
         return results
