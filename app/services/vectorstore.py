@@ -41,12 +41,12 @@ class VectorStore:
             self.index = faiss.IndexFlatL2(dim)
 
         self.index.add(embedding)
-        self.doc_ids.append(chunk_id)
+        self.chunk_ids.append(chunk_id)
         self._save()
 
     def search(self, query: str, top_k: int = 5):
         if self.index is None or not self.chunk_ids:
-            return []
+            return ["No relevant context found."]
 
         query_embedding = self.model.encode([query], convert_to_numpy=True)
         D, I = self.index.search(query_embedding, top_k)

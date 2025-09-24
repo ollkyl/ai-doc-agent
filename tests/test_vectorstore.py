@@ -1,4 +1,3 @@
-# tests/test_vectorstore.py
 from app.services.vectorstore import VectorStore
 
 
