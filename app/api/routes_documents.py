@@ -6,7 +6,7 @@ from app.models.document import Document, Chunk
 from app.services.vectorstore import VectorStore
 from pypdf import PdfReader
 import os, uuid
-from app.core.utils import split_into_chunks_by_paragraphs
+from app.core.utils import split_into_chunks
 
 
 router = APIRouter()
@@ -48,7 +48,7 @@ async def upload_document(file: UploadFile = File(...), db: AsyncSession = Depen
     doc_id = result.scalar()
 
     # Разбиваем на чанки
-    chunks = split_into_chunks_by_paragraphs(text_content, max_words=100)
+    chunks = split_into_chunks(text_content, max_words=200)
 
     # Добавляем чанки в БД и VectorStore
     for i, chunk_text in enumerate(chunks):

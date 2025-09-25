@@ -2,7 +2,7 @@ import re
 from typing import List
 
 
-def split_into_chunks_by_paragraphs(text: str, max_words: int = 100) -> List[str]:
+def split_into_chunks(text: str, max_words: int = 100) -> List[str]:
     chunks = []
     paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
 

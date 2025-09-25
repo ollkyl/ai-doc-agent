@@ -5,7 +5,7 @@ def test_vectorstore():
     vs = VectorStore()
 
     # добавляем документы
-    vs.add_documents(
+    vs.add_chunk(
         [
             "Сегодня солнечная погода",
             "Завтра будет дождь",

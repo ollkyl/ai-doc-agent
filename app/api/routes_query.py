@@ -21,7 +21,7 @@ async def ask_question(request: QueryRequest, db: AsyncSession = Depends(get_db)
     # 1. Получаем контекст через RAG
     question = request.question
     context = await rag_service.query(db, question, top_k=5)
-
+    print("Context:", context)
     # 2. Отправляем на Hugging Face API
     answer = query_hf_model(question, context)
 

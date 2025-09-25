@@ -20,18 +20,25 @@ class VectorStore:
         self.doc_ids: List[int] = []
         self.chunk_ids: List[int] = []
 
-        if self.index_file.exists():
+        self.faiss_file = self.index_file.with_suffix(".faiss")
+        self.meta_file = self.index_file.with_suffix(".pkl")
+
+        if self.faiss_file.exists() and self.meta_file.exists():
             self._load()
 
     def _load(self):
-        with open(self.index_file, "rb") as f:
+        self.index = faiss.read_index(str(self.faiss_file))
+        # Загружаем метаданные
+        with open(self.meta_file, "rb") as f:
             data = pickle.load(f)
-            self.index = data["index"]
-            self.doc_ids = data["doc_ids"]
+            self.doc_ids = data.get("doc_ids", [])
+            self.chunk_ids = data.get("chunk_ids", [])
 
     def _save(self):
-        data = {"index": self.index, "doc_ids": self.doc_ids}
-        with open(self.index_file, "wb") as f:
+        if self.index is not None:
+            faiss.write_index(self.index, str(self.faiss_file))
+        data = {"doc_ids": self.doc_ids, "chunk_ids": self.chunk_ids}
+        with open(self.meta_file, "wb") as f:
             pickle.dump(data, f)
 
     def add_chunk(self, chunk_id: int, text: str):
@@ -46,10 +53,8 @@ class VectorStore:
 
     def search(self, query: str, top_k: int = 5):
         if self.index is None or not self.chunk_ids:
-            return ["No relevant context found."]
+            return []
 
         query_embedding = self.model.encode([query], convert_to_numpy=True)
         D, I = self.index.search(query_embedding, top_k)
-
-        results = [self.chunk_ids[i] for i in I[0]]
-        return results
+        return [self.chunk_ids[i] for i in I[0]]
