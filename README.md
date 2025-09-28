@@ -1,3 +1,4 @@
+```mermaid
 graph TD
 
     user["User<br>[External]"]
@@ -37,3 +38,4 @@ graph TD
 
     llm_service_comp -->|"Communicates with | API"| llm_service_ext
     vector_store_service_comp -->|"Communicates with | API"| vector_db_ext
+```
