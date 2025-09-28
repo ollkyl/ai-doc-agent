@@ -2,7 +2,7 @@ import os
 from huggingface_hub import InferenceClient
 from dotenv import load_dotenv
 
-# Загружаем .env
+
 load_dotenv()
 
 HF_API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3"  # можно проверить другую версию
