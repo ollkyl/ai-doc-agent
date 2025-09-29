@@ -11,8 +11,9 @@ class Document(Base):
     filepath = Column(String, nullable=False)
     content = Column(Text, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-
+    owner_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     chunks = relationship("Chunk", back_populates="document", cascade="all, delete-orphan")
+    owner = relationship("User", back_populates="user_documents")
 
 
 class Chunk(Base):
